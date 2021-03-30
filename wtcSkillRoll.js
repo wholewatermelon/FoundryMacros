@@ -22,7 +22,7 @@ async function quickDialog({ data, title = `Quick Dialog`, instructions } = {}) 
     <table style="width:100%">
       ${data.map(({ type, label, options, selected }, i) => {
       if (type.toLowerCase() === `select`) {
-        return `<tr><th style="width:50%"><label>${label}</label></th><td style="width:50%"><select id="${i}qd">${options.map((e, i) => `<option value="${e}"${e === selected ? ' selected' : ''}>${e}</option>`).join(``)}</td></tr>`;
+        return `<tr><th style="width:50%"><label>${label}</label></th><td style="width:50%"><select id="${i}qd">${options.map(e => `<option value="${getOptionValue(e)}" ${getOptionName(e) === selected ? ' selected' : ''}>${getOptionName(e)}</option>`).join(``)}</td></tr>`;
       } else if (type.toLowerCase() === `checkbox`) {
         return `<tr><th style="width:50%"><label>${label}</label></th><td style="width:50%"><input type="${type}" id="${i}qd" ${options || ``}/></td></tr>`;
       } else {
@@ -58,9 +58,27 @@ async function quickDialog({ data, title = `Quick Dialog`, instructions } = {}) 
   });
 }
 
+function populateSkillsOptions() {
+  return actor.data.items
+  .filter(item => item.type === "skill")
+  .map(function(element) { 
+        return { name: element.name, value: element.data.rank };
+    });
+}
+
+function getOptionName(skill)
+{
+  return typeof skill === 'object' ? skill.name : skill;
+}
+
+function getOptionValue(skill)
+{
+  return typeof skill === 'object' ? skill.value : skill;
+}
+
 (async () => {
   let attackdata = [
-    { type: `select`, label: `Skill Bonus : `, options: [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9], selected: 0 },
+    { type: `select`, label: `Skill : `, options: populateSkillsOptions(), selected: "Fight[S]" },
     { type: `select`, label: `Attribute Bonus : `, options: [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9], selected: 0 },
     { type: `select`, label: `Other Modifiers : `, options: [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9], selected: 0 }
   ];
