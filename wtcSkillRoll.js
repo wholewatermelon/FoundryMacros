@@ -38,19 +38,17 @@ async function quickDialog({ data, title = `Quick Dialog`, instructions } = {}) 
           label: `Let's Roll!`, callback: (html) => {
             resolve(Array(data.length).fill().map((e, i) => {
               let { type } = data[i];
-              if (type.toLowerCase() === `select`) {
-                return html.find(`select#${i}qd`).val();
-              } else {
-                switch (type.toLowerCase()) {
-                  case `text`:
-                  case `password`:
-                  case `radio`:
-                    return html.find(`input#${i}qd`)[0].value;
-                  case `checkbox`:
-                    return html.find(`input#${i}qd`)[0].checked;
-                  case `number`:
-                    return html.find(`input#${i}qd`)[0].valueAsNumber;
-                }
+              switch (type.toLowerCase()) {
+                case 'select':
+                  return html.find(`select#${i}qd`).val();
+                case `text`:
+                case `password`:
+                case `radio`:
+                  return html.find(`input#${i}qd`)[0].value;
+                case `checkbox`:
+                  return html.find(`input#${i}qd`)[0].checked;
+                case `number`:
+                  return html.find(`input#${i}qd`)[0].valueAsNumber;
               }
             }));
           }
@@ -62,9 +60,6 @@ async function quickDialog({ data, title = `Quick Dialog`, instructions } = {}) 
 
 (async () => {
   let attackdata = [
-
-    /* Skill Select Drop-Down and charsheet number lookup?, maybe later? 
-    {type : 'select', label : `Skill Pick : `, options :  [unk1, unk2]} */
     { type: `select`, label: `Skill Bonus : `, options: [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9], selected: 0 },
     { type: `select`, label: `Attribute Bonus : `, options: [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9], selected: 0 },
     { type: `select`, label: `Other Modifiers : `, options: [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9], selected: 0 }
@@ -74,5 +69,4 @@ async function quickDialog({ data, title = `Quick Dialog`, instructions } = {}) 
 
   let roll = new Roll(`4df+${skill}+${attr}+${mod}`).roll()
   await roll.toMessage({ flavor: `4df Skill Roll - click to see the dice` });
-
 })();
