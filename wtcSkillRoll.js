@@ -59,7 +59,9 @@ async function quickDialog({ data, title = `Quick Dialog`, instructions } = {}) 
 }
 
 function populateSkillsOptions() {
-  return actor.data.items
+  //using Shadow Cat's Id  here for now
+  let currentActor= game.actors.get('ssZUmqTgMdjRmwXi');
+  return currentActor.data.items
   .filter(item => item.type === "skill")
   .map(function(element) { 
         return { name: element.name, value: element.data.rank };
