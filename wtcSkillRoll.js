@@ -59,13 +59,16 @@ async function quickDialog({ data, title = `Quick Dialog`, instructions } = {}) 
 }
 
 function populateSkillsOptions() {
-  //using Shadow Cat's Id  here for now
-  let currentActor= game.actors.get('ssZUmqTgMdjRmwXi');
-  return currentActor.data.items
-  .filter(item => item.type === "skill")
+  // to find a certain actor
+  // let currentActor= game.actors.get('ssZUmqTgMdjRmwXi');
+
+  // actor will be set when a token is selected
+  return actor.data.items
+  .filter(item => item.type === 'skill' && item.name != '[ATTRIBUTES]' && item.name != '[SKILLS]' && item.name != '[RESOURCES]')
   .map(function(element) { 
-        return { name: element.name, value: element.data.rank };
-    });
+        return { name: element.name, value: element.data.rank }
+    })
+    .sort((a, b) => (a.name > b.name) ? 1 : -1);
 }
 
 function getOptionName(skill)
