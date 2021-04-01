@@ -17,8 +17,8 @@ function getSkillsOptions() {
 function roll() {
   var skill = document.getElementById("skillDropDown");
   var aspectBonus = document.getElementById("aspectBonus").value;
-  var otherAdjustments = document.getElementById("otherAdjustments").value;
-  let roll = new Roll(`4df+${skill.value ? skill.value : 0}+${aspectBonus ? aspectBonus : 0}+${otherAdjustments ? otherAdjustments : 0}`).roll();
+  var adjustments = document.getElementById("adjustments").value;
+  let roll = new Roll(`4df+${skill.value ? skill.value : 0}+${aspectBonus ? aspectBonus : 0}+${adjustments ? adjustments : 0}`).roll();
   roll.toMessage({ flavor: `4df ${skill.options[skill.selectedIndex].text} Skill Roll - click to see the dice` });
 }
 
@@ -52,10 +52,10 @@ let dialogContent = `
     </tr>
     <tr>
       <th style="width:33%">
-        <label>Other Adjustments</label>
+        <label>Adjustments</label>
       </th> 
       <td style="width:33%">
-        <input type = "text" id="otherAdjustments" \>
+        <input type = "text" id="adjustments" \>
       </td>
     </tr>
   </table>
