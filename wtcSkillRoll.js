@@ -29,7 +29,7 @@ let dialogContent = `
     }
   </script>
 
-  <p>Enter the numbers for your skill, attribute and bonuses</p>
+  <p>Pick a skill and add aspect bonuses and/or adjustments</p>
   <table style="width:100%">
     <tr>
       <th style="width:33%">
@@ -44,7 +44,7 @@ let dialogContent = `
     </tr>
     <tr>
       <th style="width:33%">
-        <label>Aspect Bonusus</label>
+        <label>Aspect Bonuses</label>
       </th> 
       <td style="width:33%">
       <input type = "text" id="aspectBonus" \>
