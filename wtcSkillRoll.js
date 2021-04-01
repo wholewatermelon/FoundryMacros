@@ -1,95 +1,75 @@
-/** Simple dialog to roll Fudge dice with 3 categories of bonuses for Wearing the Cape
-  * Adapted from the Animated Objects attack/damage macro by HoneyBadger
-*/
+let initialSkill = 'Fight[S]';
+let skillsOptions = getSkillsOptions();
+let initialSkillBonus = skillsOptions?.find(s => s.name == initialSkill).value;
 
-/*quickDialog
-    Send an array of data to build a Vertical Input Dialog of Multiple Types
-    returns a promise (value is an Array of the chosen values)
-  data = [{}]
-  {} = {
-    type : `type of input`, //text, password, radio, checkbox, number, select
-    label : `Whatever you want to be listed`,
-    options : [``] or ``
+function getSkillsOptions() {
+  if (actor === undefined) {
+    return null;
   }
-*/
-
-async function quickDialog({ data, title = `Quick Dialog`, instructions } = {}) {
-  data = data instanceof Array ? data : [data];
-
-  return await new Promise((resolve) => {
-    let content = `
-    <p>${instructions || ''}<p>
-    <table style="width:100%">
-      ${data.map(({ type, label, options, selected }, i) => {
-      if (type.toLowerCase() === `select`) {
-        return `<tr><th style="width:50%"><label>${label}</label></th><td style="width:50%"><select id="${i}qd">${options.map(e => `<option value="${getOptionValue(e)}" ${getOptionName(e) === selected ? ' selected' : ''}>${getOptionName(e)}</option>`).join(``)}</td></tr>`;
-      } else if (type.toLowerCase() === `checkbox`) {
-        return `<tr><th style="width:50%"><label>${label}</label></th><td style="width:50%"><input type="${type}" id="${i}qd" ${options || ``}/></td></tr>`;
-      } else {
-        return `<tr><th style="width:50%"><label>${label}</label></th><td style="width:50%"><input type="${type}" id="${i}qd" value="${options instanceof Array ? options[2] : options}"/></td></tr>`;
-      }
-    }).join(``)}
-    </table>`;
-
-    new Dialog({
-      title, content,
-      buttons: {
-        Ok: {
-          label: `Let's Roll!`, callback: (html) => {
-            resolve(Array(data.length).fill().map((e, i) => {
-              let { type } = data[i];
-              switch (type.toLowerCase()) {
-                case 'select':
-                  return html.find(`select#${i}qd`).val();
-                case `text`:
-                case `password`:
-                case `radio`:
-                  return html.find(`input#${i}qd`)[0].value;
-                case `checkbox`:
-                  return html.find(`input#${i}qd`)[0].checked;
-                case `number`:
-                  return html.find(`input#${i}qd`)[0].valueAsNumber;
-              }
-            }));
-          }
-        }
-      }
-    }).render(true);
-  });
-}
-
-function populateSkillsOptions() {
-  // to find a certain actor
-  // let currentActor= game.actors.get('ssZUmqTgMdjRmwXi');
-
-  // actor will be set when a token is selected
   return actor.data.items
-  .filter(item => item.type === 'skill' && item.name != '[ATTRIBUTES]' && item.name != '[SKILLS]' && item.name != '[RESOURCES]')
-  .map(function(element) { 
-        return { name: element.name, value: element.data.rank }
+    .filter(item => item.type === 'skill' && item.name != '[ATTRIBUTES]' && item.name != '[SKILLS]' && item.name != '[RESOURCES]')
+    .map(function (element) {
+      return { name: element.name, value: element.data.rank }
     })
     .sort((a, b) => (a.name > b.name) ? 1 : -1);
 }
 
-function getOptionName(skill)
-{
-  return typeof skill === 'object' ? skill.name : skill;
+function roll() {
+  var skill = document.getElementById("skillDropDown");
+  var aspectBonus = document.getElementById("aspectBonus").value;
+  var otherAdjustments = document.getElementById("otherAdjustments").value;
+  let roll = new Roll(`4df+${skill.value ? skill.value : 0}+${aspectBonus ? aspectBonus : 0}+${otherAdjustments ? otherAdjustments : 0}`).roll();
+  roll.toMessage({ flavor: `4df ${skill.options[skill.selectedIndex].text} Skill Roll - click to see the dice` });
 }
 
-function getOptionValue(skill)
-{
-  return typeof skill === 'object' ? skill.value : skill;
-}
+let dialogContent = `
+  <script>
+    function SkillChanged(selectedSkill) {
+      document.getElementById("skillBonus").innerHTML = (selectedSkill.value >= 0? '+': '') + selectedSkill.value
+    }
+  </script>
 
-(async () => {
-  let attackdata = [
-    { type: `select`, label: `Skill : `, options: populateSkillsOptions(), selected: "Fight[S]" },
-    { type: `select`, label: `Attribute Bonus : `, options: [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9], selected: 0 },
-    { type: `select`, label: `Other Modifiers : `, options: [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9], selected: 0 }
-  ];
+  <p>Enter the numbers for your skill, attribute and bonuses</p>
+  <table style="width:100%">
+    <tr>
+      <th style="width:33%">
+        <label>Skill</label>
+      </th>
+      <td style="width:33%">
+        <select id="skillDropDown" onchange=SkillChanged(this)>
+          ${skillsOptions.map(e => `<option value="${e.value}" ${e.name == initialSkill ? ' selected' : ''}>${e.name}</option>`).join(``)}
+        </select>
+      </td>
+      <td style="width:33%;border 1px solid black;padding:5px" id="skillBonus">${(initialSkillBonus >= 0 ? '+' : '') + initialSkillBonus}</td>
+    </tr>
+    <tr>
+      <th style="width:33%">
+        <label>Aspect Bonusus</label>
+      </th> 
+      <td style="width:33%">
+      <input type = "text" id="aspectBonus" \>
+      </td>
+    </tr>
+    <tr>
+      <th style="width:33%">
+        <label>Other Adjustments</label>
+      </th> 
+      <td style="width:33%">
+        <input type = "text" id="otherAdjustments" \>
+      </td>
+    </tr>
+  </table>
+  `;
 
-  const [skill, attr, mod] = await quickDialog({ data: attackdata, title: `WtC Skill Roll`, instructions: 'Enter the numbers for your skill, attribute and bonuses' });
-
-  let roll = new Roll(`4df+${skill}+${attr}+${mod}`).roll()
-  await roll.toMessage({ flavor: `4df Skill Roll - click to see the dice` });
-})();
+let d = new Dialog({
+  title: 'WtC Skill Roll',
+  content: dialogContent,
+  buttons: {
+    roll: {
+      icon: '<i class="fas fa-dice-d20"></i>',
+      label: "Roll",
+      callback: () => roll()
+    }
+  }
+});
+d.render(true);
