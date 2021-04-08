@@ -2,16 +2,16 @@
   * Adapted from the Animated Objects attack/damage macro by HoneyBadger
 */
 
-let initialSkill = 'Four[A]';
+let initialSkill = 'Fight[S]';
 let skillsOptions = getSkillsOptions();
-let initialSkillBonus = skillsOptions?.find(s => s.name == initialSkill).value;
+let initialSkillBonus = skillsOptions?.find(s => s.name == initialSkill)?.value;
 
 let attributes = skillsOptions?.filter(item => item.name.includes('[A]')).sort((a, b) => (a.name > b.name) ? 1 : -1);
 let skills = skillsOptions?.filter(item => item.name.includes('[S]')).sort((a, b) => (a.name > b.name) ? 1 : -1);
 let resources = skillsOptions?.filter(item => item.name.includes('[R]')).sort((a, b) => (a.name > b.name) ? 1 : -1);
 
 function getSkillsOptions() {
-  if (actor === undefined) {
+  if (!actor?.data?.items) {
     return null;
   }
   return actor.data.items
@@ -19,7 +19,7 @@ function getSkillsOptions() {
     .map(function (element) {
       return { name: element.name, value: element.data.rank }
     });
-    
+
   // For Testing
   // return [
   //   { name: "One[A]", value: "1" },
