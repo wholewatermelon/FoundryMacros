@@ -17,7 +17,7 @@ function getSkillsOptions() {
     {name: "Four[A]", value: "4"},
     {name: "Five[S]", value: "5"},
     {name: "Six[R]", value: "6"},
-  ]
+  ];
 }
 
 function roll() {
@@ -44,6 +44,7 @@ let dialogContent = skillsOptions?`
       if (skillName.includes('[A]'))
       {
         document.getElementById("attributeBonusRow").style.display = 'none';
+        var attributeBonus = document.getElementById("attributeBonus").value = '';
         document.getElementById("buffer").style.display = '';
       }
       else
