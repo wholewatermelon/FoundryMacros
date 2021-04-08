@@ -32,14 +32,30 @@ let dialogContent = `
   <script>
     function SkillChanged(selectedSkill) {
       document.getElementById("skillBonus").innerHTML = (selectedSkill.value >= 0? '+': '') + selectedSkill.value;
+      ShowHideAttributeBonus();
+    }
+    function ShowHideAttributeBonus() {
+      var skill = document.getElementById("skillDropDown");
+      var skillName = skill.options[skill.selectedIndex].text
+      console.log("skill:" + skillName);
+      if (skillName.includes('[A]'))
+      {
+        document.getElementById("attributeBonusRow").style.display = 'none';
+        document.getElementById("buffer").style.display = '';
+      }
+      else
+      {
+        document.getElementById("attributeBonusRow").style.display = '';
+        document.getElementById("buffer").style.display = 'none';
+      }
     }
   </script>
 
-  <p>Pick a skill and add aspect bonuses and/or adjustments</p>
+  <p style="width:100%">Pick a Character Rating and add modifiers</p>
   <table style="width:100%">
     <tr>
       <th style="width:33%">
-        <label>Skill</label>
+        <label>Character Rating</label>
       </th>
       <td style="width:33%">
         <select id="skillDropDown" onchange=SkillChanged(this)>
@@ -48,7 +64,7 @@ let dialogContent = `
       </td>
       <td style="width:33%;border 1px solid black;padding:5px" id="skillBonus">${(initialSkillBonus >= 0 ? '+' : '') + initialSkillBonus}</td>
     </tr>
-    <tr id="attributeBonusRow" style="display='none'">
+    <tr id="attributeBonusRow" style=${initialSkill.includes(['A'])?"display:none": "display:''"}>
       <th style="width:33%">
         <label id="attributeBonusLabel">Attribute Bonus</label>
       </th> 
@@ -73,6 +89,7 @@ let dialogContent = `
       </td>
     </tr>
   </table>
+  <div id="buffer" style=${initialSkill.includes(['A'])?"height:50px;display:''": "display:none"}></div>
   `;
 
 let d = new Dialog({
