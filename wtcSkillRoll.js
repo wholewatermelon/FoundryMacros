@@ -28,7 +28,10 @@ function roll() {
   console.log(`4df + skill:${skill.value ? skill.value : 0} + attributeBonus:${attributeBonus ? attributeBonus : 0} + aspectBonus:${aspectBonus ? aspectBonus : 0} + circumstanceModifier:${circumstanceModifier ? circumstanceModifier : 0}`);
 }
 
-let dialogContent = `
+function close() {}
+
+let errorContent = 'Please select an Actor token and run the macro again';
+let dialogContent = skillsOptions?`
   <script>
     function SkillChanged(selectedSkill) {
       document.getElementById("skillBonus").innerHTML = (selectedSkill.value >= 0? '+': '') + selectedSkill.value;
@@ -37,7 +40,7 @@ let dialogContent = `
     function ShowHideAttributeBonus() {
       var skill = document.getElementById("skillDropDown");
       var skillName = skill.options[skill.selectedIndex].text
-      console.log("skill:" + skillName);
+      
       if (skillName.includes('[A]'))
       {
         document.getElementById("attributeBonusRow").style.display = 'none';
@@ -89,17 +92,17 @@ let dialogContent = `
       </td>
     </tr>
   </table>
-  <div id="buffer" style=${initialSkill.includes(['A'])?"height:50px;display:''": "display:none"}></div>
-  `;
+  <div id="buffer" style=${initialSkill.includes(['A'])?"height:40px;display:''": "display:none"}></div>
+  `:'';
 
 let d = new Dialog({
   title: 'WtC Skill Roll',
-  content: dialogContent,
+  content: skillsOptions ? dialogContent : errorContent,
   buttons: {
     roll: {
       icon: '<i class="fas fa-dice-d20"></i>',
-      label: "Roll",
-      callback: () => roll()
+      label: skillsOptions ? "Roll" : "Close",
+      callback: () => skillsOptions ? roll() : close()
     }
   }
 });
