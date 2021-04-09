@@ -33,7 +33,7 @@ function getSkillsOptions() {
 
 function roll() {
   var skill = document.getElementById("skillDropDown");
-  var attributeBonus = document.getElementById("attributeBonus").value;
+  var attributeBonus = document.getElementById("attributeDropDown").value;
   var aspectBonus = document.getElementById("aspectBonus").value;
   var circumstanceModifier = document.getElementById("circumstanceModifier").value;
   console.log(`4df + skill:${skill.value ? skill.value : 0} + attributeBonus:${attributeBonus ? attributeBonus : 0} + aspectBonus:${aspectBonus ? aspectBonus : 0} + circumstanceModifier:${circumstanceModifier ? circumstanceModifier : 0}`);
@@ -48,6 +48,9 @@ let dialogContent = skillsOptions ? `
       document.getElementById("skillBonus").innerHTML = (selectedSkill.value >= 0? '+': '') + selectedSkill.value;
       ShowHideAttributeBonus();
     }
+    function AttributeBonusChanged(attributeBonus) {
+      document.getElementById("attributeBonus").innerHTML = (attributeBonus.value > 0? '+': '') + attributeBonus.value;
+    }
     function ShowHideAttributeBonus() {
       var skill = document.getElementById("skillDropDown");
       var skillName = skill.options[skill.selectedIndex].text
@@ -55,7 +58,7 @@ let dialogContent = skillsOptions ? `
       if (skillName.includes('[A]'))
       {
         document.getElementById("attributeBonusRow").style.display = 'none';
-        var attributeBonus = document.getElementById("attributeBonus").value = '';
+        var attributeBonus = document.getElementById("attributeDropDown").value = '';
         document.getElementById("buffer").style.display = '';
       }
       else
@@ -66,7 +69,7 @@ let dialogContent = skillsOptions ? `
     }
   </script>
 
-  <p style="width:100%">Pick a Character Rating and add modifiers</p>
+  <h3 style="text-align:center; margin-top:10px">${actor.data.name} Skill Roll</h3>
   <table style="width:100%">
     <tr>
       <th style="width:33%">
@@ -75,13 +78,13 @@ let dialogContent = skillsOptions ? `
       <td style="width:33%">
         <select id="skillDropDown" onchange=SkillChanged(this)>
           <optgroup label="ATTRIBUTES">
-            ${attributes.map(e => `<option value="${e.value}" ${e.name == initialSkill ? ' selected' : ''}>${e.name}</option>`).join(``)}
+            ${attributes.map(a => `<option value="${a.value}" ${a.name == initialSkill ? ' selected' : ''}>${a.name}</option>`).join(``)}
           </optgroup>
           <optgroup label="RESOURCES">
-            ${resources.map(e => `<option value="${e.value}" ${e.name == initialSkill ? ' selected' : ''}>${e.name}</option>`).join(``)}
+            ${resources.map(r => `<option value="${r.value}" ${r.name == initialSkill ? ' selected' : ''}>${r.name}</option>`).join(``)}
           </optgroup>
           <optgroup label="SKILLS">
-            ${skills.map(e => `<option value="${e.value}" ${e.name == initialSkill ? ' selected' : ''}>${e.name}</option>`).join(``)}
+            ${skills.map(s => `<option value="${s.value}" ${s.name == initialSkill ? ' selected' : ''}>${s.name}</option>`).join(``)}
           </optgroup>
         </select>
       </td>
@@ -91,9 +94,13 @@ let dialogContent = skillsOptions ? `
       <th style="width:33%">
         <label id="attributeBonusLabel">Attribute Bonus</label>
       </th> 
-      <td style="width:33%">
-      <input type = "text" id="attributeBonus" \>
+      <td>
+        <select id="attributeDropDown" onchange=AttributeBonusChanged(this)>
+            <option value=''></option>
+              ${attributes.map(a => `<option value="${a.value}">${a.name}</option>`).join(``)}
+        </select>
       </td>
+      <td style="width:33%;border 1px solid black;padding:5px" id="attributeBonus"></td>
     </tr>
     <tr>
       <th style="width:33%">
