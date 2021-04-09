@@ -6,7 +6,7 @@ let initialSkill = 'Fight[S]';
 let skillsOptions = getSkillsOptions();
 let initialSkillBonus = skillsOptions?.find(s => s.name == initialSkill)?.value;
 
-let attributes = skillsOptions?.filter(item => item.name.includes('[A]')).sort((a, b) => (a.name > b.name) ? 1 : -1);
+let attributes = skillsOptions?.filter(item => item.name.includes('[A]')).sort((a, b) => (a.name > b.name) ? 1 : -1); 
 let skills = skillsOptions?.filter(item => item.name.includes('[S]')).sort((a, b) => (a.name > b.name) ? 1 : -1);
 let resources = skillsOptions?.filter(item => item.name.includes('[R]')).sort((a, b) => (a.name > b.name) ? 1 : -1);
 
@@ -41,6 +41,22 @@ function roll() {
 
 function close() { }
 
+function GetAttributeBonus(attributeValue) {
+  if (attributeValue < 3) {
+    return 0
+  };
+  if (attributeValue < 5) {
+    return 1;
+  }
+  if (attributeValue < 7) {
+    return 2;
+  }
+  if (attributeValue < 9) {
+    return 3;
+  }
+  return 4;
+}
+
 let errorContent = 'Please select an Actor token and run the macro again';
 let dialogContent = skillsOptions ? `
   <script>
@@ -49,7 +65,7 @@ let dialogContent = skillsOptions ? `
       ShowHideAttributeBonus();
     }
     function AttributeBonusChanged(attributeBonus) {
-      document.getElementById("attributeBonus").innerHTML = (attributeBonus.value > 0? '+': '') + attributeBonus.value;
+      document.getElementById("attributeBonus").innerHTML = (attributeBonus.value >= 0? '+': '') + attributeBonus.value;
     }
     function ShowHideAttributeBonus() {
       var skill = document.getElementById("skillDropDown");
@@ -67,6 +83,7 @@ let dialogContent = skillsOptions ? `
         document.getElementById("buffer").style.display = 'none';
       }
     }
+    
   </script>
 
   <h3 style="text-align:center; margin-top:10px">${actor.data.name} Skill Roll</h3>
@@ -97,7 +114,7 @@ let dialogContent = skillsOptions ? `
       <td>
         <select id="attributeDropDown" onchange=AttributeBonusChanged(this)>
             <option value=''></option>
-              ${attributes.map(a => `<option value="${a.value}">${a.name}</option>`).join(``)}
+              ${attributes.map(a => `<option value="${GetAttributeBonus(a.value)}">${a.name}</option>`).join(``)}
         </select>
       </td>
       <td style="width:33%;border 1px solid black;padding:5px" id="attributeBonus"></td>
