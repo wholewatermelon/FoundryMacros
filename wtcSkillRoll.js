@@ -2,15 +2,20 @@
   * Adapted from the Animated Objects attack/damage macro by HoneyBadger
 */
 
-let initialSkill = 'Fight[S]';
-let skillsOptions = getSkillsOptions();
-let initialSkillBonus = skillsOptions?.find(s => s.name == initialSkill)?.value;
 
-let attributes = skillsOptions?.filter(item => item.name.includes('[A]')).sort((a, b) => (a.name > b.name) ? 1 : -1); 
-let skills = skillsOptions?.filter(item => item.name.includes('[S]')).sort((a, b) => (a.name > b.name) ? 1 : -1);
-let resources = skillsOptions?.filter(item => item.name.includes('[R]')).sort((a, b) => (a.name > b.name) ? 1 : -1);
+let initiallySelectedSkill = 'Fight[S]';
+let excludedSkills = ['[ATTRIBUTES]', '[SKILLS]', '[RESOURCES]']
+let attributeNames = ['Alertness[A]', 'Athleticism[A]', 'Discernment[A]', 'Physique[A]', 'Presence[A]', 'Willpower[A]', 'Engineering[A]'];
+let resourceNames = ['Contacts[R]', 'Reputation[R]', 'Wealth[R]'];
 
-function getSkillsOptions() {
+let allItems = getallItems();
+let initiallySelectedSkillBonus = allItems?.find(s => s.name == initiallySelectedSkill)?.value;
+
+let attributes = allItems?.filter(item => attributeNames.includes(item.name)).sort((a, b) => (a.name > b.name) ? 1 : -1); 
+let resources = allItems?.filter(item => resourceNames.includes(item.name)).sort((a, b) => (a.name > b.name) ? 1 : -1);
+let skills = allItems?.filter(item => !attributeNames.includes(item.name) && !(resourceNames.includes(item.name))).sort((a, b) => (a.name > b.name) ? 1 : -1);
+
+function getallItems() {
   if (!actor?.data?.items) {
     return null;
   }
@@ -26,7 +31,7 @@ function roll() {
   var attributeBonus = document.getElementById("attributeDropDown")
   var aspectBonus = document.getElementById("aspectBonus").value;
   var circumstanceModifier = document.getElementById("circumstanceModifier").value;
-  console.log(`4df + ${skill.options[skill.selectedIndex].text}(${skill.value ? skill.value : 0}) + ${attributeBonus.value ? (attributeBonus.options[attributeBonus.selectedIndex].text + '(' + attributeBonus.value + ')') : ''} + aspectBonus(${aspectBonus ? aspectBonus : 0}) + circumstanceModifier(${circumstanceModifier ? circumstanceModifier : 0})`);
+  console.log(`4df + ${skill.options[skill.selectedIndex].text}(${skill.value ? skill.value : 0}) + ${attributeBonus.value ? (attributeBonus.options[attributeBonus.selectedIndex].text + '(' + attributeBonus.value + ')') : ''} + Aspect Bonus(${aspectBonus ? aspectBonus : 0}) + Circumstance Modifier(${circumstanceModifier ? circumstanceModifier : 0})`);
 }
 
 function close() { }
@@ -48,7 +53,7 @@ function GetAttributeBonus(attributeValue) {
 }
 
 let errorContent = 'Please select an Actor token and run the macro again';
-let dialogContent = skillsOptions ? `
+let dialogContent = allItems ? `
   <script>
     function SkillChanged(selectedSkill) {
       document.getElementById("skillBonus").innerHTML = (selectedSkill.value >= 0? '+': '') + selectedSkill.value;
@@ -85,19 +90,19 @@ let dialogContent = skillsOptions ? `
       <td style="width:33%">
         <select id="skillDropDown" onchange=SkillChanged(this)>
           <optgroup label="ATTRIBUTES">
-            ${attributes.map(a => `<option value="${a.value}" ${a.name == initialSkill ? ' selected' : ''}>${a.name}</option>`).join(``)}
+            ${attributes.map(a => `<option value="${a.value}" ${a.name == initiallySelectedSkill ? ' selected' : ''}>${a.name}</option>`).join(``)}
           </optgroup>
           <optgroup label="RESOURCES">
-            ${resources.map(r => `<option value="${r.value}" ${r.name == initialSkill ? ' selected' : ''}>${r.name}</option>`).join(``)}
+            ${resources.map(r => `<option value="${r.value}" ${r.name == initiallySelectedSkill ? ' selected' : ''}>${r.name}</option>`).join(``)}
           </optgroup>
           <optgroup label="SKILLS">
-            ${skills.map(s => `<option value="${s.value}" ${s.name == initialSkill ? ' selected' : ''}>${s.name}</option>`).join(``)}
+            ${skills.map(s => `<option value="${s.value}" ${s.name == initiallySelectedSkill ? ' selected' : ''}>${s.name}</option>`).join(``)}
           </optgroup>
         </select>
       </td>
-      <td style="width:33%;border 1px solid black;padding:5px" id="skillBonus">${(initialSkillBonus >= 0 ? '+' : '') + initialSkillBonus}</td>
+      <td style="width:33%;border 1px solid black;padding:5px" id="skillBonus">${(initiallySelectedSkillBonus >= 0 ? '+' : '') + initiallySelectedSkillBonus}</td>
     </tr>
-    <tr id="attributeBonusRow" style=${initialSkill.includes(['A']) ? "display:none" : "display:''"}>
+    <tr id="attributeBonusRow" style=${initiallySelectedSkill.includes(['A']) ? "display:none" : "display:''"}>
       <th style="width:33%">
         <label id="attributeBonusLabel">Attribute Bonus</label>
       </th> 
@@ -114,7 +119,7 @@ let dialogContent = skillsOptions ? `
         <label>Aspect Bonus</label>
       </th> 
       <td style="width:33%">
-      <input type = "text" id="aspectBonus" \>
+      <input type="number" id="aspectBonus" \>
       </td>
     </tr>
     <tr>
@@ -122,21 +127,21 @@ let dialogContent = skillsOptions ? `
         <label>Circumstance Modifier</label>
       </th> 
       <td style="width:33%">
-        <input type = "text" id="circumstanceModifier" \>
+        <input type="number" id="circumstanceModifier" \>
       </td>
     </tr>
   </table>
-  <div id="buffer" style=${initialSkill.includes(['A']) ? "height:40px;display:''" : "display:none"}></div>
+  <div id="buffer" style=${initiallySelectedSkill.includes(['A']) ? "height:40px;display:''" : "display:none"}></div>
   `: '';
 
 let d = new Dialog({
   title: 'WtC Skill Roll',
-  content: skillsOptions ? dialogContent : errorContent,
+  content: allItems ? dialogContent : errorContent,
   buttons: {
     roll: {
       icon: '<i class="fas fa-dice-d20"></i>',
-      label: skillsOptions ? "Roll" : "Close",
-      callback: () => skillsOptions ? roll() : close()
+      label: allItems ? "Roll" : "Close",
+      callback: () => allItems ? roll() : close()
     }
   }
 });
