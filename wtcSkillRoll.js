@@ -19,24 +19,14 @@ function getSkillsOptions() {
     .map(function (element) {
       return { name: element.name, value: element.data.rank }
     });
-
-  // For Testing
-  // return [
-  //   { name: "One[A]", value: "1" },
-  //   { name: "Two[S]", value: "2" },
-  //   { name: "Three[R]", value: "3" },
-  //   { name: "Four[A]", value: "4" },
-  //   { name: "Five[S]", value: "5" },
-  //   { name: "Six[R]", value: "6" },
-  // ];
 }
 
 function roll() {
   var skill = document.getElementById("skillDropDown");
-  var attributeBonus = document.getElementById("attributeDropDown").value;
+  var attributeBonus = document.getElementById("attributeDropDown")
   var aspectBonus = document.getElementById("aspectBonus").value;
   var circumstanceModifier = document.getElementById("circumstanceModifier").value;
-  console.log(`4df + skill:${skill.value ? skill.value : 0} + attributeBonus:${attributeBonus ? attributeBonus : 0} + aspectBonus:${aspectBonus ? aspectBonus : 0} + circumstanceModifier:${circumstanceModifier ? circumstanceModifier : 0}`);
+  console.log(`4df + ${skill.options[skill.selectedIndex].text}(${skill.value ? skill.value : 0}) + ${attributeBonus.value ? (attributeBonus.options[attributeBonus.selectedIndex].text + '(' + attributeBonus.value + ')') : ''} + aspectBonus(${aspectBonus ? aspectBonus : 0}) + circumstanceModifier(${circumstanceModifier ? circumstanceModifier : 0})`);
 }
 
 function close() { }
@@ -65,7 +55,7 @@ let dialogContent = skillsOptions ? `
       ShowHideAttributeBonus();
     }
     function AttributeBonusChanged(attributeBonus) {
-      document.getElementById("attributeBonus").innerHTML = (attributeBonus.value >= 0? '+': '') + attributeBonus.value;
+      document.getElementById("attributeBonus").innerHTML = (attributeBonus.value && attributeBonus.value >= 0? '+': '') + attributeBonus.value;
     }
     function ShowHideAttributeBonus() {
       var skill = document.getElementById("skillDropDown");
