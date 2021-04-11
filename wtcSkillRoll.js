@@ -1,11 +1,15 @@
 /** Simple dialog to roll Fudge dice with 3 categories of bonuses for Wearing the Cape
-  * Adapted from the Animated Objects attack/damage macro by HoneyBadger
+  * Used Animated Objects attack/damage macro by HoneyBadger as a reference
 */
 
-
+// Skill initially selected in drop down 
 let initiallySelectedSkill = 'Fight[S]';
+
+// Skills to be excluded in the drop down
 let excludedSkills = ['[ATTRIBUTES]', '[SKILLS]', '[RESOURCES]']
-let attributeNames = ['Alertness[A]', 'Athleticism[A]', 'Discernment[A]', 'Physique[A]', 'Presence[A]', 'Willpower[A]', 'Engineering[A]'];
+
+// Attributes and Resources. Everything not in these two lists will be classified as Skills
+let attributeNames = ['Alertness[A]', 'Athleticism[A]', 'Discernment[A]', 'Physique[A]', 'Presence[A]', 'Willpower[A]'];
 let resourceNames = ['Contacts[R]', 'Reputation[R]', 'Wealth[R]'];
 
 let allItems = getallItems();
@@ -13,24 +17,29 @@ let initiallySelectedSkillBonus = allItems?.find(s => s.name == initiallySelecte
 
 let attributes = allItems?.filter(item => attributeNames.includes(item.name)).sort((a, b) => (a.name > b.name) ? 1 : -1); 
 let resources = allItems?.filter(item => resourceNames.includes(item.name)).sort((a, b) => (a.name > b.name) ? 1 : -1);
-let skills = allItems?.filter(item => !attributeNames.includes(item.name) && !(resourceNames.includes(item.name))).sort((a, b) => (a.name > b.name) ? 1 : -1);
+let skills = allItems?.filter(item => isSkill(item.name)).sort((a, b) => (a.name > b.name) ? 1 : -1);
 
+// Get all items from selected player token
 function getallItems() {
   if (!actor?.data?.items) {
     return null;
   }
   return actor.data.items
-    .filter(item => item.type === 'skill' && item.name != '[ATTRIBUTES]' && item.name != '[SKILLS]' && item.name != '[RESOURCES]')
+    .filter(item => item.type === 'skill' && !excludedSkills.includes(item.name))
     .map(function (element) {
       return { name: element.name, value: element.data.rank }
     });
 }
 
+function isSkill(name) {
+  return (attributeNames.includes(name) || resourceNames.includes(name)) ? false : true;
+}
+
 function roll() {
-  var skill = document.getElementById("skillDropDown");
-  var attributeBonus = document.getElementById("attributeDropDown")
-  var aspectBonus = document.getElementById("aspectBonus").value;
-  var circumstanceModifier = document.getElementById("circumstanceModifier").value;
+  let skill = document.getElementById("skillDropDown");
+  let attributeBonus = document.getElementById("attributeDropDown")
+  let aspectBonus = document.getElementById("aspectBonus").value;
+  let circumstanceModifier = document.getElementById("circumstanceModifier").value;
   console.log(`4df + ${skill.options[skill.selectedIndex].text}(${skill.value ? skill.value : 0}) + ${attributeBonus.value ? (attributeBonus.options[attributeBonus.selectedIndex].text + '(' + attributeBonus.value + ')') : ''} + Aspect Bonus(${aspectBonus ? aspectBonus : 0}) + Circumstance Modifier(${circumstanceModifier ? circumstanceModifier : 0})`);
 }
 
@@ -63,13 +72,14 @@ let dialogContent = allItems ? `
       document.getElementById("attributeBonus").innerHTML = (attributeBonus.value && attributeBonus.value >= 0? '+': '') + attributeBonus.value;
     }
     function ShowHideAttributeBonus() {
-      var skill = document.getElementById("skillDropDown");
-      var skillName = skill.options[skill.selectedIndex].text
+      let skill = document.getElementById("skillDropDown");
+      let skillName = skill.options[skill.selectedIndex].text
+      let selectedOptGroup = document.querySelector('#skillDropDown option:checked').parentElement.label;
       
-      if (skillName.includes('[A]'))
+      if (selectedOptGroup == 'ATTRIBUTES' || optGroup == 'RESOURCES')
       {
         document.getElementById("attributeBonusRow").style.display = 'none';
-        var attributeBonus = document.getElementById("attributeDropDown").value = '';
+        let attributeBonus = document.getElementById("attributeDropDown").value = '';
         document.getElementById("buffer").style.display = '';
       }
       else
@@ -102,7 +112,7 @@ let dialogContent = allItems ? `
       </td>
       <td style="width:33%;border 1px solid black;padding:5px" id="skillBonus">${(initiallySelectedSkillBonus >= 0 ? '+' : '') + initiallySelectedSkillBonus}</td>
     </tr>
-    <tr id="attributeBonusRow" style=${initiallySelectedSkill.includes(['A']) ? "display:none" : "display:''"}>
+    <tr id="attributeBonusRow" style=${isSkill(initiallySelectedSkill) ? "display:'' ": "display:none"}>
       <th style="width:33%">
         <label id="attributeBonusLabel">Attribute Bonus</label>
       </th> 
@@ -131,7 +141,7 @@ let dialogContent = allItems ? `
       </td>
     </tr>
   </table>
-  <div id="buffer" style=${initiallySelectedSkill.includes(['A']) ? "height:40px;display:''" : "display:none"}></div>
+  <div id="buffer" style=${isSkill(initiallySelectedSkill) ? "display:none" : "height:40px;display:''"}></div>
   `: '';
 
 let d = new Dialog({
