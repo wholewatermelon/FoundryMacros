@@ -40,7 +40,10 @@ function roll() {
   let attributeBonus = document.getElementById("attributeDropDown")
   let aspectBonus = document.getElementById("aspectBonus").value;
   let circumstanceModifier = document.getElementById("circumstanceModifier").value;
-  console.log(`4df + ${skill.options[skill.selectedIndex].text}(${skill.value ? skill.value : 0}) ${attributeBonus.value ? (' + ' + attributeBonus.options[attributeBonus.selectedIndex].text + '(' + attributeBonus.value + ')') : ''} + Aspect Bonus(${aspectBonus ? aspectBonus : 0}) + Circumstance Modifier(${circumstanceModifier ? circumstanceModifier : 0})`);
+  
+  let roll = new Roll(`4df+${skill.value ? skill.value : 0}${attributeBonus.value ? '+' + attributeBonus.value : ''}${aspectBonus ? '+' + aspectBonus : ''}${circumstanceModifier ? '+' + circumstanceModifier : ''}`).roll();
+  let rollDialog = `4df + ${skill.options[skill.selectedIndex].text}(${skill.value ? skill.value : 0})${attributeBonus.value ? (' + ' + attributeBonus.options[attributeBonus.selectedIndex].text + '(' + attributeBonus.value + ')') : ''}${aspectBonus ? ' + Aspect Bonus('+aspectBonus +')': ''}${circumstanceModifier ? ' + Circumstance Modifier(' + circumstanceModifier + ')': ''}`;
+  roll.toMessage({ flavor: `${actor.data.name} Skill Roll: ${rollDialog} - click to see the dice` });
 }
 
 function close() { }
@@ -82,6 +85,7 @@ let dialogContent = allItems ? `
       {
         document.getElementById("attributeBonusRow").style.display = 'none';
         let attributeBonus = document.getElementById("attributeDropDown").value = '';
+        document.getElementById("attributeBonus").innerHTML = '';
         document.getElementById("buffer").style.display = '';
       }
       else
