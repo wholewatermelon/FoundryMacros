@@ -8,7 +8,7 @@ let initiallySelectedSkill = 'Fight[S]';
 // Skills to be excluded in the drop down
 let excludedSkills = ['[ATTRIBUTES]', '[SKILLS]', '[RESOURCES]']
 
-// Attributes and Resources. Everything not in these two lists will be classified as Skills
+// Attribute and Resource Names. Everything not in these two lists will be classified as a Skill
 let attributeNames = ['Alertness[A]', 'Athleticism[A]', 'Discernment[A]', 'Physique[A]', 'Presence[A]', 'Willpower[A]'];
 let resourceNames = ['Contacts[R]', 'Reputation[R]', 'Wealth[R]'];
 
@@ -19,7 +19,7 @@ let attributes = allItems?.filter(item => attributeNames.includes(item.name)).so
 let resources = allItems?.filter(item => resourceNames.includes(item.name)).sort((a, b) => (a.name > b.name) ? 1 : -1);
 let skills = allItems?.filter(item => isSkill(item.name)).sort((a, b) => (a.name > b.name) ? 1 : -1);
 
-// Get all items from selected player token
+// Get all items from the selected player token
 function getallItems() {
   if (!actor?.data?.items) {
     return null;
@@ -40,7 +40,7 @@ function roll() {
   let attributeBonus = document.getElementById("attributeDropDown")
   let aspectBonus = document.getElementById("aspectBonus").value;
   let circumstanceModifier = document.getElementById("circumstanceModifier").value;
-  console.log(`4df + ${skill.options[skill.selectedIndex].text}(${skill.value ? skill.value : 0}) + ${attributeBonus.value ? (attributeBonus.options[attributeBonus.selectedIndex].text + '(' + attributeBonus.value + ')') : ''} + Aspect Bonus(${aspectBonus ? aspectBonus : 0}) + Circumstance Modifier(${circumstanceModifier ? circumstanceModifier : 0})`);
+  console.log(`4df + ${skill.options[skill.selectedIndex].text}(${skill.value ? skill.value : 0}) ${attributeBonus.value ? (' + ' + attributeBonus.options[attributeBonus.selectedIndex].text + '(' + attributeBonus.value + ')') : ''} + Aspect Bonus(${aspectBonus ? aspectBonus : 0}) + Circumstance Modifier(${circumstanceModifier ? circumstanceModifier : 0})`);
 }
 
 function close() { }
@@ -76,7 +76,9 @@ let dialogContent = allItems ? `
       let skillName = skill.options[skill.selectedIndex].text
       let selectedOptGroup = document.querySelector('#skillDropDown option:checked').parentElement.label;
       
-      if (selectedOptGroup == 'ATTRIBUTES' || optGroup == 'RESOURCES')
+      // Only display the AttributeBonus drop down if the selected skill is neither an attribute nor a resource
+      // Show a Buffer at the bottom of the window when the AttributeBonus is hidden, so the dialog remains roughly the same size
+      if (selectedOptGroup == 'ATTRIBUTES' || selectedOptGroup == 'RESOURCES')
       {
         document.getElementById("attributeBonusRow").style.display = 'none';
         let attributeBonus = document.getElementById("attributeDropDown").value = '';
