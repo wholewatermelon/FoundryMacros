@@ -27,7 +27,7 @@ function getallItems() {
   return actor.data.items
     .filter(item => item.type === 'skill' && !excludedSkills.includes(item.name))
     .map(function (element) {
-      return { name: element.name, value: element.data.rank }
+      return { name: element.name, value: element.data.data ? element.data.data.rank : element.data.rank }
     });
 }
 
